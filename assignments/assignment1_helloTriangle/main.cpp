@@ -9,27 +9,34 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
 float vertices[9] = {
-	//x     //y    //z
-	-0.5, -0.5, 0.0, // bottom left
-	0.5, -0.5, 0.0, // bottom right
-	0.0, 0.5, 0.0 }; // top center
+	//x   //y  //z  //r  //g  //b  //a
+   -0.5, -0.5, 0.0, 1.0, 0.0, 0.0, 1.0,// bottom left
+	0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, // bottom right
+	0.0,  0.5, 0.0, 0.0, 0.0, 1.0, 1.0  }; // top center
 
 //setting GL position to our OG position - just a string
 const char* vertexShaderSource = R"(
 	#version 450
 	layout(location = 0) in vec3 vPos;
+	layout(location = 1) in vec4 vColor;
+	out vec4 Color;
+	uniform float _Time;
 		void main(){
-			gl_Position = vec4(vPos,1.0);
-			}
+			Color = vColor;
+			vec3 offset = vec3(0, sin(vPos.x + _Time), 0) * 0.5;
+			gl_Position = vec4(vPos + offset, 1.0);
+		}
 )";
 
 //Vec 4 used for colors = RGBA all values are 0-1 range where 0 iz white and 1 is black 
 const char* fragmentShaderSource = R"(
-#version 450
-out vec4 FragColor;
-void main(){
-	FragColor = vec4(1.0);
-}
+	#version 450
+	out vec4 FragColor;
+	in vec4 Color;
+	uniform float _Time = 1.0;
+	void main(){
+		FragColor = Color * abs(sin(_Time));
+	}
 )";
 
 unsigned int createVAO(float* vertexData, int numVertices)
@@ -50,9 +57,13 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	//define position wit numvertices "originally three floats"
+	//position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
 	glEnableVertexAttribArray(0);
 
+	//color attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)(sizeof(float)*3));
+	glEnableVertexAttribArray(1);
 
 	return vao;
 }
@@ -139,6 +150,12 @@ int main() {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glUseProgram(shader);
 		glBindVertexArray(vao);
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		float time = (float)glfwGetTime();
+		int timeLocation = glGetUniformLocation(shader, "_Time");
+		glUniform1f(timeLocation, time);
+
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
 		glfwSwapBuffers(window);
