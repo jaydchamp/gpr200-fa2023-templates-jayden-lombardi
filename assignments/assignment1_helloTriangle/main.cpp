@@ -166,7 +166,6 @@ int main() {
 
 		//In render loop...
 		//The current time in seconds this frame
-		float time = (float)glfwGetTime();
 		//Get the location of the uniform by name
 		int timeLocation = glGetUniformLocation(shader, "_Time");
 		//Set the value of the variable at the location
