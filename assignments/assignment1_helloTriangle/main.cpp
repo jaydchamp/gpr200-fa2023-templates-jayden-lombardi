@@ -20,11 +20,9 @@ const char* vertexShaderSource = R"(
 	layout(location = 0) in vec3 vPos;
 	layout(location = 1) in vec4 vColor;
 	out vec4 Color;
-	uniform float _Time;
 	void main(){
 		Color = vColor;
-		vec3 offset = vec3(0,sin(vPos.x + _Time),0)*0.5;
-		gl_Position = vec4(vPos + offset,1.0);
+		gl_Position = vec4(vPos,1.0);
 	}
 )";
 
@@ -33,9 +31,9 @@ const char* fragmentShaderSource = R"(
 	#version 450
 	out vec4 FragColor;
 	in vec4 Color;
-	uniform float _Time;
+	uniform float _Time = 1.0f;
 	void main(){
-		FragColor = Color * abs(sin(_Time));
+		FragColor = Color;
 	}
 )";
 
@@ -47,7 +45,7 @@ unsigned int createVAO(float* vertexData, int numVertices)
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * numVertices, vertexData, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 7 * numVertices, vertexData, GL_STATIC_DRAW);
 	//sizeof(float) * 3 * numVertices this will calculate size of array in bytes 
 
 	unsigned int vao;
@@ -58,11 +56,11 @@ unsigned int createVAO(float* vertexData, int numVertices)
 
 	//define position wit numvertices "originally three floats"
 	//position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)0);
 	glEnableVertexAttribArray(0);
 
 	//color attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * numVertices, (const void*)(sizeof(float) * 3));
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(float) * 7, (const void*)(sizeof(float) * 3));
 	glEnableVertexAttribArray(1);
 
 	return vao;
@@ -120,10 +118,6 @@ unsigned int createShaderProgram(const char* vertexShaderSource, const char* fra
 	return shaderProgram;
 }
 
-float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
-float triangleBrightness = 1.0f;
-bool showInGUIDemoWindow = true;
-
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -144,8 +138,6 @@ int main() {
 		return 1;
 	}
 
-
-
 	unsigned int shader = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 	unsigned int vao = createVAO(vertices, 3);
 
@@ -158,22 +150,20 @@ int main() {
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//set Uniforms
-		glUniform3f(glGetUniformLocation(shader, "_Color"), triangleColor[0], triangleColor[1], triangleColor[2]);
 		glUseProgram(shader);
 		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
+		glfwSwapBuffers(window);
+
 		//In render loop...
 		//The current time in seconds this frame
 		//Get the location of the uniform by name
-		int timeLocation = glGetUniformLocation(shader, "_Time");
+		//int timeLocation = glGetUniformLocation(shader, "_Time");
 		//Set the value of the variable at the location
-		glUniform1f(timeLocation, time);
+		//glUniform1f(timeLocation, time);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-		glfwSwapBuffers(window);
+		//glDrawArrays(GL_TRIANGLES, 0, 3);
 	}
 	printf("Shutting down...");
 }
