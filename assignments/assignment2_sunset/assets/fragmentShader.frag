@@ -1,4 +1,3 @@
-const char* fragmentShaderSource = R"(
 	#version 450
 	out vec4 FragColor;
 	uniform vec3 _Color;
@@ -6,4 +5,3 @@ const char* fragmentShaderSource = R"(
 	void main(){
 		FragColor = vec4(_Color * _Brightness,1.0);
 	}
-)";
