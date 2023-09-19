@@ -14,17 +14,27 @@ using namespace jlLib;
 
 //unsigned int createShader(GLenum shaderType, const char* sourceCode);
 //unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
-unsigned int createVAO(float* vertexData, int numVertices);
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indiciesData, int numIndicies);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
-float vertices[9] = {
-	//x   //y  //z   
-	-0.5, -0.5, 0.0, 
-	 0.5, -0.5, 0.0,
-	 0.0,  0.5, 0.0 
+struct Vertex {
+	float x, y, z;
+	float u, v;
+};
+Vertex vertices[4] = {
+	//x  y  z   u   v 
+	{-0.5, -0.5, 0.0, 0.0}, //Bottom Left
+	{ 0.5, -0.5, 1.0, 0.0}, //Bottom Right
+	{ 0.5,  0.5, 1.0, 1.0}, //Top Right
+	{-0.5,  0.5, 0.0, 1.0}  //Top Left
+};
+
+unsigned int indicies[6] = {
+	0,1,1, //triangle 1
+	1,1,0  //triangle 2
 };
 
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
@@ -43,6 +53,9 @@ int main() {
 		printf("GLFW failed to create window");
 		return 1;
 	}
+
+
+
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
@@ -50,6 +63,11 @@ int main() {
 		printf("GLAD Failed to load GL headers");
 		return 1;
 	}
+
+	//WireFrame
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	//Shaded
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	//Initialize ImGUI
 	IMGUI_CHECKVERSION();
@@ -66,10 +84,10 @@ int main() {
 	//std::string vertexShaderSource = jlLib::loadShaderSourceFromFile("assets/vertexShader.vert");
 	//std::string fragmentShaderSource = jlLib::loadShaderSourceFromFile("assets/fragmentShader.frag");
 	//unsigned int shader = createShaderProgram(vertexShaderSource.c_str(), fragmentShaderSource.c_str());
-	unsigned int vao = createVAO(vertices, 3);
+	//unsigned int vao = createVAO(vertices, 3);
 
 	//glUseProgram(shader);
-	glBindVertexArray(vao);
+	//glBindVertexArray(vao);
 
 
 
@@ -86,7 +104,7 @@ int main() {
 		shader.setVec3("_Color", triangleColor[0], triangleColor[1], triangleColor[2]);
 		shader.setFloat("_Brightness", triangleBrightness);
 
-		glDrawArrays(GL_TRIANGLES, 0, 3);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
 		//Render UI
 		{
@@ -154,7 +172,7 @@ int main() {
 //	return shaderProgram;
 //}
 
-unsigned int createVAO(float* vertexData, int numVertices) {
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indiciesData, int numIndicies) {
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -166,9 +184,18 @@ unsigned int createVAO(float* vertexData, int numVertices) {
 	//Allocate space for + send vertex data to GPU.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
 
+	unsigned int ebo;
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndicies, indiciesData, GL_STATIC_DRAW);
+
 	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
 	glEnableVertexAttribArray(0);
+
+	//UV
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)(offsetof(Vertex, u)));
+	glEnableVertexAttribArray(1);
 
 	return vao;
 }

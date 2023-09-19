@@ -4,7 +4,6 @@
 namespace jlLib {
 	std::string loadShaderSourceFromFile(const std::string& filePath);
 
-
 	class Shader {
 	public:
 		Shader(const std::string& vertexShader, const std::string& fragmentShader);
