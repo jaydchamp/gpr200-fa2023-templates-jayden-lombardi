@@ -12,9 +12,7 @@
 
 using namespace jlLib;
 
-//unsigned int createShader(GLenum shaderType, const char* sourceCode);
-//unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
-unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indiciesData, int numIndicies);
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 const int SCREEN_WIDTH = 1080;
@@ -32,9 +30,9 @@ Vertex vertices[4] = {
 	{-0.5,  0.5, 0.0, 1.0}  //Top Left
 };
 
-unsigned int indicies[6] = {
-	0,1,1, //triangle 1
-	1,1,0  //triangle 2
+unsigned int indices[6] = {
+	0 , 1 , 1 , //Triangle 1
+	1 , 1 , 0  //Triangle 2
 };
 
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
@@ -54,8 +52,6 @@ int main() {
 		return 1;
 	}
 
-
-
 	glfwMakeContextCurrent(window);
 	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
@@ -64,10 +60,6 @@ int main() {
 		return 1;
 	}
 
-	//WireFrame
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	//Shaded
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
 	//Initialize ImGUI
 	IMGUI_CHECKVERSION();
@@ -79,17 +71,13 @@ int main() {
 	shader.use();
 	shader.setFloat("_MyFloat", 4.2);
 	shader.setVec2("_MyVec2", 15, 12);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-
-	//std::string vertexShaderSource = jlLib::loadShaderSourceFromFile("assets/vertexShader.vert");
-	//std::string fragmentShaderSource = jlLib::loadShaderSourceFromFile("assets/fragmentShader.frag");
-	//unsigned int shader = createShaderProgram(vertexShaderSource.c_str(), fragmentShaderSource.c_str());
 	//unsigned int vao = createVAO(vertices, 3);
 
 	//glUseProgram(shader);
 	//glBindVertexArray(vao);
-
-
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -130,48 +118,6 @@ int main() {
 	printf("Shutting down...");
 }
 
-
-//unsigned int createShader(GLenum shaderType, const char* sourceCode) {
-//	//Create a new vertex shader object
-//	unsigned int shader = glCreateShader(shaderType);
-//	//Supply the shader object with source code
-//	glShaderSource(shader, 1, &sourceCode, NULL);
-//	//Compile the shader object
-//	glCompileShader(shader);
-//	int success;
-//	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-//	if (!success) {
-//		//512 is an arbitrary length, but should be plenty of characters for our error message.
-//		char infoLog[512];
-//		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-//		printf("Failed to compile shader: %s", infoLog);
-//	}
-//	return shader;
-//}
-
-//unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource) {
-//	unsigned int vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSource);
-//	unsigned int fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
-//
-//	unsigned int shaderProgram = glCreateProgram();
-//	//Attach each stage
-//	glAttachShader(shaderProgram, vertexShader);
-//	glAttachShader(shaderProgram, fragmentShader);
-//	//Link all the stages together
-//	glLinkProgram(shaderProgram);
-//	int success;
-//	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-//	if (!success) {
-//		char infoLog[512];
-//		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-//		printf("Failed to link shader program: %s", infoLog);
-//	}
-//	//The linked program now contains our compiled code, so we can delete these intermediate objects
-//	glDeleteShader(vertexShader);
-//	glDeleteShader(fragmentShader);
-//	return shaderProgram;
-//}
-
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indiciesData, int numIndicies) {
 	unsigned int vao;
 	glGenVertexArrays(1, &vao);
@@ -180,16 +126,15 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indici
 	//Define a new buffer id
 	unsigned int vbo;
 	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	//Allocate space for + send vertex data to GPU.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo); // changed these from GL_ARRAY_BUFFER to GL_ELEMENT_ARRAY_BUFFER
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);	//Allocate space for + send vertex data to GPU.
 
 	unsigned int ebo;
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndicies, indiciesData, GL_STATIC_DRAW);
 
-	//Position attribute
+	//Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
 	glEnableVertexAttribArray(0);
 
