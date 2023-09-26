@@ -60,7 +60,6 @@ namespace jlLib
 		return shaderProgram;
 	};
 
-
 	//Shader Class:
 	Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader)
 	{
