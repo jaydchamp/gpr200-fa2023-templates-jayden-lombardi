@@ -12,6 +12,15 @@
 
 using namespace jlLib;
 
+<<<<<<< HEAD
+=======
+unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices);
+void framebufferSizeCallback(GLFWwindow* window, int width, int height);
+
+const int SCREEN_WIDTH = 1080;
+const int SCREEN_HEIGHT = 720;
+
+>>>>>>> 15dd33ff3cc06a2223097ec311f43fb53f003f31
 struct Vertex {
 	float x, y, z;
 	float u, v;
@@ -24,6 +33,7 @@ Vertex vertices[4] = {
 	{-0.5,  0.5, 0.0, 0.0, 1.0}  //Top Left
 };
 
+<<<<<<< HEAD
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indiciesData, int numIndicies);
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -35,6 +45,11 @@ const int SCREEN_HEIGHT = 720;
 unsigned int indicies[6] = {
 	0,1,2, //triangle 1
 	2,3,0  //triangle 2
+=======
+unsigned int indices[6] = {
+	0 , 1 , 1 , //Triangle 1
+	1 , 1 , 0  //Triangle 2
+>>>>>>> 15dd33ff3cc06a2223097ec311f43fb53f003f31
 };
 
 float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
@@ -62,10 +77,13 @@ int main() {
 		return 1;
 	}
 
+<<<<<<< HEAD
 	//WireFrame
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	//Shaded
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+=======
+>>>>>>> 15dd33ff3cc06a2223097ec311f43fb53f003f31
 
 	//Initialize ImGUI
 	IMGUI_CHECKVERSION();
@@ -74,9 +92,22 @@ int main() {
 	ImGui_ImplOpenGL3_Init();
 
 	jlLib::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+<<<<<<< HEAD
 	//shader.use();
 
 	unsigned int vao = createVAO(vertices, 4, indicies, 6);
+=======
+	shader.use();
+	shader.setFloat("_MyFloat", 4.2);
+	shader.setVec2("_MyVec2", 15, 12);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	//unsigned int vao = createVAO(vertices, 3);
+
+	//glUseProgram(shader);
+	//glBindVertexArray(vao);
+>>>>>>> 15dd33ff3cc06a2223097ec311f43fb53f003f31
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -122,16 +153,21 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indici
 	//Define a new buffer id
 	unsigned int vbo;
 	glGenBuffers(1, &vbo);
+<<<<<<< HEAD
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	//Allocate space for + send vertex data to GPU.
 	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertexData, GL_STATIC_DRAW);
+=======
+	glBindBuffer(GL_ARRAY_BUFFER, vbo); // changed these from GL_ARRAY_BUFFER to GL_ELEMENT_ARRAY_BUFFER
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * numVertices * 3, vertexData, GL_STATIC_DRAW);	//Allocate space for + send vertex data to GPU.
+>>>>>>> 15dd33ff3cc06a2223097ec311f43fb53f003f31
 
 	unsigned int ebo;
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndicies, indiciesData, GL_STATIC_DRAW);
 
-	//Position attribute
+	//Position
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex, x));
 	glEnableVertexAttribArray(0);
 
