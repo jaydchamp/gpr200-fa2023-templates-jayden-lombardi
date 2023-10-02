@@ -20,7 +20,7 @@ namespace ew {
 		return buffer.str();
 	}
 
-	/// <summary>
+	/// <summary
 	/// Creates and compiles a shader object of a given type
 	/// </summary>
 	/// <param name="shaderType">Expects GL_VERTEX_SHADER, GL_FRAGMENT_SHADER, etc.</param>
@@ -32,6 +32,7 @@ namespace ew {
 		//Supply the shader object with source code
 		glShaderSource(shader, 1, &sourceCode, NULL);
 		//Compile the shader object
+		printf("HELLLLLLLLLLLLLLLO", shaderType);
 		glCompileShader(shader);
 		int success;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);

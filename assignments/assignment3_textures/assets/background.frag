@@ -5,9 +5,8 @@ in vec2 UV;
 
 uniform sampler2D backgroundTexture1;
 uniform sampler2D backgroundTexture2;
-
-uniform vec2 scrollOff;
-uniform vec2 backScale;
+uniform vec2 scrollOffset;
+uniform vec2 backgroundScale;
 
 void main()
 {
@@ -16,6 +15,6 @@ void main()
     fUV = fract(fUV);
 
     vec4 color1 = texture(backgroundTexture1, fUV);
-    vec4 color2 = texture(backgroundTexture2, flUV);
-    FragColor = mix(color1, color2, 0.5); //interpolation
+    vec4 color2 = texture(backgroundTexture2, fUV); // Corrected variable name
+    FragColor = mix(color1, color2, 0.5); // interpolation
 }
