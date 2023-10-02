@@ -7,7 +7,6 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
-
 #include <ew/shader.h>
 
 struct Vertex {
@@ -31,6 +30,10 @@ unsigned short indices[6] = {
 	0, 1, 2,
 	2, 3, 0
 };
+
+//Create a different shader for background vs character
+ew::Shader backgroundShader("assets/background.vert", "assets/background.frag"); 
+ew::Shader characterShader("assets/character.vert", "assets/character.frag"); 
 
 int main() {
 	printf("Initializing...");
@@ -58,10 +61,6 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-	//Create a different shader for background vs character
-	ew::Shader backgroundShader("assets/background.vert", "assets/background.frag");
-	ew::Shader characterShader("assets/character.vert", "assets/character.frag");
-
 	unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
 	glBindVertexArray(quadVAO);
@@ -73,15 +72,15 @@ int main() {
 
 		//draw background
 		backgroundShader.use();
-		//bindBackgroundTextures();
+		//bindBackground.Textures();
 		//setBackgroundShaderUniforms();
 		//drawQuad();
 
 		//Draw character
 		characterShader.use();
-		bindCharacterTextures();
-		setCharacterShaderUniforms();
-		drawQuad();
+		//bindCharacterTextures();
+		//setCharacterShaderUniforms();
+		//drawQuad();
 
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
