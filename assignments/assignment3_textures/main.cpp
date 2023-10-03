@@ -89,27 +89,31 @@ int main() {
 		// Draw background
 		backgroundShader.use();
 
-		//backgroundShader.setInt("backgroundTexture1", 0); // Bind to texture unit 0
+		backgroundShader.setInt("backgroundTexture1", 0); // Bind to texture unit 0
 		backgroundShader.setInt("backgroundTexture2", 1); // Bind to texture unit 1
+		backgroundShader.setFloat("iTime", static_cast<float>(glfwGetTime())); // Set iTime
 		backgroundShader.setVec2("scrollOffset", scrollOffsetX, scrollOffsetY); 
 		backgroundShader.setVec2("backgroundScale", scale, scale);
 
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, backgroundTexture1);
+		//glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL); 
 
 		glActiveTexture(GL_TEXTURE1);
 		glBindTexture(GL_TEXTURE_2D, backgroundTexture2);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 		//Draw character
 		characterShader.use();
 
-		characterShader.setVec2("characterScale", characterScaleX, characterScaleY);  
+		characterShader.setVec2("characterScale", characterScaleX, characterScaleY);
+		characterShader.setFloat("iTime", static_cast<float>(glfwGetTime())); // Set iTime
 		characterShader.setFloat("characterOpacity", characterOpacity); 
 		characterShader.setVec2("characterPosition", characterPosX, characterPosY);
+		characterShader.setVec2("iResolution", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-		glActiveTexture(GL_TEXTURE2); 
+		glActiveTexture(GL_TEXTURE0); 
 		glBindTexture(GL_TEXTURE_2D, characterTexture1);
-
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
 		glfwSwapBuffers(window);

@@ -7,6 +7,7 @@ uniform sampler2D backgroundTexture1;
 uniform sampler2D backgroundTexture2;
 uniform vec2 scrollOffset;
 uniform vec2 backgroundScale;
+uniform float iTime;
 
 void main()
 {

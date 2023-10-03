@@ -9,5 +9,5 @@ void main()
 {
     UV = vUV;
     vec2 scaledPosition = vPos.xy * backgroundScale;
-    gl_Position = vec4(scaledPosition, 1.0);
+    gl_Position = vec4(scaledPosition, vPos.z, 1.0);
 }
