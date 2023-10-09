@@ -11,12 +11,15 @@
 #include <ew/shader.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
+#include <jlLib/transformations.h> //I added this
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 //Square aspect ratio for now. We will account for this with projection later.
 const int SCREEN_WIDTH = 720;
 const int SCREEN_HEIGHT = 720;
+
+const int numCubes = 4;
 
 int main() {
 	printf("Initializing...");
@@ -47,14 +50,28 @@ int main() {
 	//Enable back face culling
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
-
-	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	
-	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
+
+	//instances of all cubes
+	myLib::Transform transforms[numCubes]; 
+	transforms[0].position = ew::Vec3(-0.5f, 0.5f, 0.0f);
+	transforms[0].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	transforms[0].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	transforms[1].position = ew::Vec3(0.5f, 0.5f, 0.0f);
+	transforms[1].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	transforms[1].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	transforms[2].position = ew::Vec3(0.5f, -0.5f, 0.0f);
+	transforms[2].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	transforms[2].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	transforms[3].position = ew::Vec3(-0.5f, -0.5f, 0.0f);
+	transforms[3].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	transforms[3].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
 	
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -62,12 +79,12 @@ int main() {
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//Set uniforms
+		//Set uniforms for all cubes
 		shader.use();
-
-		//TODO: Set model matrix uniform
-
-		cubeMesh.draw();
+		for (int i = 0; i < numCubes; i++) {
+			shader.setMat4("_Model", transforms[i].getModelMatrix());
+			cubeMesh.draw();
+		}
 
 		//Render UI
 		{
@@ -75,8 +92,17 @@ int main() {
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
 
-			ImGui::Begin("Transform");
-			ImGui::End();
+			for (size_t i = 0; i < numCubes; i++) 
+			{
+				ImGui::PushID(i);
+				if (ImGui::CollapsingHeader("Transform"))	
+				{
+					ImGui::DragFloat3("Position", &transforms[i].position.x, 0.05f);
+					ImGui::DragFloat3("Rotation", &transforms[i].rotation.x, 1.0f);
+					ImGui::DragFloat3("Scale", &transforms[i].scale.x, 0.05f);
+				}
+				ImGui::PopID();
+			}
 
 			ImGui::Render();
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

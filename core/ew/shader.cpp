@@ -32,7 +32,6 @@ namespace ew {
 		//Supply the shader object with source code
 		glShaderSource(shader, 1, &sourceCode, NULL);
 		//Compile the shader object
-		printf("HELLLLLLLLLLLLLLLO", shaderType);
 		glCompileShader(shader);
 		int success;
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
