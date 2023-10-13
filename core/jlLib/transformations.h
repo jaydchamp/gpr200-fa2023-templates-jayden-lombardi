@@ -4,7 +4,8 @@
 
 namespace myLib {
 	//Identity matrix
-	inline ew::Mat4 Identity() {
+	inline ew::Mat4 Identity()
+	{
 		return ew::Mat4(
 			//x axis, y axis, z axis, w axis
 			1, 0, 0, 0,
@@ -14,7 +15,8 @@ namespace myLib {
 		);
 	};
 	//Scale on x,y,z axes
-	inline ew::Mat4 Scale(ew::Vec3 s) {
+	inline ew::Mat4 Scale(ew::Vec3 s)
+	{
 		return ew::Mat4(
 			s.x, 0, 0, 0,
 			0, s.y, 0, 0,
@@ -23,7 +25,8 @@ namespace myLib {
 		);
 	};
 	//Rotation around X axis (pitch) in radians
-	inline ew::Mat4 RotateX(float rad) {
+	inline ew::Mat4 RotateX(float rad) 
+	{
 		float c = cos(rad);
 		float s = sin(rad);
 		return ew::Mat4(
@@ -34,7 +37,8 @@ namespace myLib {
 		);
 	};
 	//Rotation around Y axis (yaw) in radians
-	inline ew::Mat4 RotateY(float rad) {
+	inline ew::Mat4 RotateY(float rad) 
+	{
 		float c = cos(rad);
 		float s = sin(rad);
 		return ew::Mat4(
@@ -45,7 +49,8 @@ namespace myLib {
 		);
 	};
 	//Rotation around Z axis (roll) in radians
-	inline ew::Mat4 RotateZ(float rad) {
+	inline ew::Mat4 RotateZ(float rad) 
+	{
 		float c = cos(rad);
 		float s = sin(rad);
 		return ew::Mat4(
@@ -56,7 +61,8 @@ namespace myLib {
 		);
 	};
 	//Translate x,y,z
-	inline ew::Mat4 Translate(ew::Vec3 t) {
+	inline ew::Mat4 Translate(ew::Vec3 t) 
+	{
 		return ew::Mat4(
 			1, 0, 0, t.x,
 			0, 1, 0, t.y,
@@ -64,6 +70,32 @@ namespace myLib {
 			0, 0, 0, 1
 		);
 	};
+
+	//Creates a right handed view space
+	//eye = eye (camera) position
+	//target = position to look at
+	//up = up axis, usually(0,1,0)
+	inline ew::Mat4 LookAt(ew::Vec3 eye, ew::Vec3 target, ew::Vec3 up) 
+	{
+		//use ew::Cross for cross product!
+		//step 1: constructing of the vectors: f r and u 
+		//dividing by scaler (1) to normalize vectors
+		//given 2 vetors you get one perpendicular to the both
+		//using normalize and cross functions
+		//step 2: plugging them into the matrix
+	};
+	//Orthographic projection
+	inline ew::Mat4 Orthographic(float height, float aspect, float near, float far) 
+	{
+		
+	};
+	//Perspective projection
+	//fov = vertical aspect ratio (radians)
+	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far)
+	{
+		
+	};
+
 
 	struct Transform {
 		ew::Vec3 position = ew::Vec3(0.0f, 0.0f, 0.0f);
