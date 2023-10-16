@@ -15,7 +15,7 @@ set(CORE_INC_DIR
  CACHE PATH "CORE INCLUDE SOURCE PATH"
 )
 
-add_library(core STATIC ${CORE_SRC} ${CORE_INC} "jlLib/texture.h" "jlLib/texture.cpp"  "jlLib/transformations.h")
+add_library(core STATIC ${CORE_SRC} ${CORE_INC} "jlLib/texture.h" "jlLib/texture.cpp"  )
 
 find_package(OpenGL REQUIRED)
 

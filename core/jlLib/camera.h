@@ -1,7 +1,8 @@
 #pragma once
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
-//core/myLib
+#include "../ew/ewMath/transformations.h"
+//#include "transformations.h" 
 
 namespace myLib
 {
@@ -9,7 +10,7 @@ namespace myLib
 	{
 		ew::Vec3 position; //camera body position
 		ew::Vec3 target; //position to look at
-		
+
 		float fov; //vertical field of view (degrees)
 		float aspectRatio; // screen width divided by screen height
 		float nearPlane; //near plane istance (+Z)
@@ -19,11 +20,19 @@ namespace myLib
 
 		ew::Mat4 ViewMatrix()//go from World->View space
 		{
-			//Uses the function LookAt()
+			return ew::LookAt(position, target, ew::Vec3(0.0f, 1.0f, 0.0f)); 
 		}
 		ew::Mat4 ProjectionMatrix() // go from View->Clip space
 		{
-			//Will use either Ortho or Perspective depending on the bool
+			if (orthographic) {
+				//Orthographic projection
+				return ew::Orthographic(orthoSize, aspectRatio, nearPlane, farPlane); 
+			}
+			else {
+				//Perspective projection
+				float fovRadians = fov * 3.14159265358979323846f / 180.0f;
+				return ew::Perspective(fovRadians, aspectRatio, nearPlane, farPlane);  
+			}
 		}
-	}
+	};
 }

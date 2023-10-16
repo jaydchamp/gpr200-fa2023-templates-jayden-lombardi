@@ -11,6 +11,7 @@
 #include <ew/shader.h>
 #include <ew/procGen.h>
 #include <ew/transform.h>
+#include <jlLib/camera.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -55,16 +56,36 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
-	
-	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
 
 	//Cube positions
-	for (size_t i = 0; i < NUM_CUBES; i++)
-	{
-		cubeTransforms[i].position.x = i % (NUM_CUBES / 2) - 0.5;
-		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
-	}
+	//for (size_t i = 0; i < NUM_CUBES; i++)
+	//{	cubeTransforms[i].position.x = i % (NUM_CUBES / 2) - 0.5;
+	//	cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;}
+
+	cubeTransforms[0].position = ew::Vec3(-0.5f, 0.5f, 0.0f);
+	cubeTransforms[0].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	cubeTransforms[0].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	cubeTransforms[1].position = ew::Vec3(0.5f, 0.5f, 0.0f);
+	cubeTransforms[1].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	cubeTransforms[1].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	cubeTransforms[2].position = ew::Vec3(0.5f, -0.5f, 0.0f);
+	cubeTransforms[2].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+	cubeTransforms[2].scale = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+	cubeTransforms[3].position = ew::Vec3(-0.5f, -0.5f, 0.0f);
+	cubeTransforms[3].rotation = ew::Vec3(0.0f, 0.0f, 0.0f);
+
+	myLib::Camera camera;
+	camera.position = ew::Vec3(0.0f, 0.0f, 5.0f);
+	camera.target = ew::Vec3(0.0f, 0.0f, 0.0f);
+	camera.fov = 60.0f;
+	camera.nearPlane = 0.1f;
+	camera.farPlane = 100.0f;
+	camera.orthographic = false;
+	camera.orthoSize = 6.0f; 
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -79,9 +100,18 @@ int main() {
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//Construct model matrix
-			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
-			cubeMesh.draw();
+			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix()); 
+			shader.setMat4("_View", camera.ViewMatrix());
+			shader.setMat4("_Projection", camera.ProjectionMatrix());
+			cubeMesh.draw(); 
 		}
+
+		printf("Camera Position: %.2f, %.2f, %.2f\n", camera.position.x, camera.position.y, camera.position.z);
+		printf("Camera Target: %.2f, %.2f, %.2f\n", camera.target.x, camera.target.y, camera.target.z);
+		printf("CUBE1 Position: %.2f, %.2f, %.2f\n", cubeTransforms[0].position.x, cubeTransforms[0].position.y, cubeTransforms[0].position.z);
+		printf("CUBE2 Position: %.2f, %.2f, %.2f\n", cubeTransforms[1].position.x, cubeTransforms[1].position.y, cubeTransforms[1].position.z);
+		printf("CUBE3 Position: %.2f, %.2f, %.2f\n", cubeTransforms[2].position.x, cubeTransforms[2].position.y, cubeTransforms[2].position.z);
+		printf("CUBE4 Position: %.2f, %.2f, %.2f\n", cubeTransforms[3].position.x, cubeTransforms[3].position.y, cubeTransforms[3].position.z);
 
 		//Render UI
 		{
@@ -90,21 +120,33 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Settings");
+
+			if (ImGui::CollapsingHeader("Camera")) {
+				ImGui::DragFloat3("Camera Position", &camera.position.x, 0.05f);
+				ImGui::DragFloat3("Camera Target", &camera.target.x, 0.05f);
+				ImGui::DragFloat("FOV", &camera.fov, 1.0f);
+				ImGui::DragFloat("Near Plane", &camera.nearPlane, 0.1f);
+				ImGui::DragFloat("Far Plane", &camera.farPlane, 1.0f);
+				ImGui::Checkbox("Orthographic", &camera.orthographic);
+				if (camera.orthographic) {
+					ImGui::DragFloat("Ortho Size", &camera.orthoSize, 0.1f);
+				}
+			}
+
 			ImGui::Text("Cubes");
-			for (size_t i = 0; i < NUM_CUBES; i++)
-			{
+			for (size_t i = 0; i < NUM_CUBES; i++) {
 				ImGui::PushID(i);
 				if (ImGui::CollapsingHeader("Transform")) {
-					ImGui::DragFloat3("Position", &cubeTransforms[i].position.x, 0.05f);
+					ImGui::DragFloat3("Position", &cubeTransforms[i].position.x, 0.05f); 
 					ImGui::DragFloat3("Rotation", &cubeTransforms[i].rotation.x, 1.0f);
-					ImGui::DragFloat3("Scale", &cubeTransforms[i].scale.x, 0.05f);
+					ImGui::DragFloat3("Scale", &cubeTransforms[i].scale.x, 0.05f); 
 				}
-				ImGui::PopID();
+				ImGui::PopID(); 
 			}
-			ImGui::Text("Camera");
-			ImGui::End();
-			
-			ImGui::Render();
+
+			ImGui::End(); 
+
+			ImGui::Render(); 
 			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		}
 
