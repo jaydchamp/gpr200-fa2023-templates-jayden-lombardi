@@ -81,8 +81,8 @@ namespace ew {
 	{
 		//step 1: constructing vectors: f r and u 
 		ew::Vec3 f = ew::Normalize(target - eye); //forward/back
-		ew::Vec3 r = ew::Normalize(ew::Cross(up, f)); //right/left
-		ew::Vec3 u = ew::Cross(f, r); //up/down
+		ew::Vec3 r = ew::Normalize(ew::Cross(f, up)); //right/left
+		ew::Vec3 u = ew::Cross(r, f); //up/down
 
 		//dividing by scaler (1) to normalize vectors
 		//given 2 vetors you get one perpendicular to the both
@@ -128,10 +128,10 @@ namespace ew {
 
 		//ew::Mat4 result = ew::Mat4::Identity();
 		return ew::Mat4(
-			2.0f / (right - left), 0.0f, 0.0f, -(right + left) / (right - left),
-			0.0f, 2.0f / (top - bottom), 0.0f, -(top + bottom) / (top - bottom),
-			0.0f, 0.0f, -2.0f / (far - near), -(far + near) / (far - near),
-			0.0f, 0.0f, 0.0f, 1.0f
+			2.0f / (right - left), 0.0f					, 0.0f				  , -(right + left) / (right - left),
+			0.0f				 , 2.0f / (top - bottom), 0.0f				  , -(top + bottom) / (top - bottom),
+			0.0f				 , 0.0f					, -2.0f / (far - near), -(far + near) / (far - near),
+			0.0f				 , 0.0f					, 0.0f				  , 1.0f
 		);
 	};
 
@@ -140,13 +140,12 @@ namespace ew {
 	inline ew::Mat4 Perspective(float fov, float aspect, float near, float far) 
 	{
 		float tanHalfFOV = tan(fov * 0.5f);
-		float range = near - far;
 
 		return ew::Mat4(
-			1.0f / (aspect * tanHalfFOV), 0.0f, 0.0f, 0.0f,
-			0.0f, 1.0f / tanHalfFOV, 0.0f, 0.0f,
-			0.0f, 0.0f, (-near - far) / range, (2.0f * near * far) / range,
-			0.0f, 0.0f, 1.0f, 0.0f
+			1.0f / ((aspect * tanHalfFOV) * aspect), 0.0f			   , 0.0f					, 0.0f,
+			0.0f								   , 1.0f / tanHalfFOV , 0.0f					, 0.0f,
+			0.0f						   		   , 0.0f			   , (near+far) / (near-far), (2.0f * far * near) / (near-far),
+			0.0f								   , 0.0f			   ,-1.0f				    , 0.0f
 		);
 	};
 }
