@@ -176,11 +176,7 @@ void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls
 		controls->prevMouseY = mouseY; 
 	}
 
-	//yaw += (cursorX - prevCursorX) * mouseSens;
-	//pitch -= (cursorY - preCursorY) * mouseSens;
-
 	//TODO: Get mouse position delta for this frame
-<<<<<<< HEAD
 	double xOffset = mouseX - controls->prevMouseX;
 	double yOffset = controls->prevMouseY - mouseY;
 
@@ -210,22 +206,9 @@ void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls
 
 	//setting target to a point in front of the camera along its forward direction, our LookAt will be updated accordingly when rendering.
 	camera->target = camera->position + forward;
-=======
-	//TODO: Add to yaw and pitch
-	//TODO: Clamp pitch between -89 and 89 degrees
-	//TODO: Update prevCursorX and prevCursorY
->>>>>>> f60982bfb7c8531e44fe82eb125ebf44558a6dd6
 
 	//Remember previous mouse position
 	controls->prevMouseX = mouseX; 
 	controls->prevMouseY = mouseY;
-<<<<<<< HEAD
-=======
 
-	//Construct forward vector using yaw and pitch. Don't forget to convert to radians!
-	//ew::Vec3 forward = ???
-	//By setting target to a point in front of the camera along its forward direction, our LookAt will be updated accordingly when rendering.
-	//camera->target = camera->position + forward; 
-
->>>>>>> f60982bfb7c8531e44fe82eb125ebf44558a6dd6
 }
