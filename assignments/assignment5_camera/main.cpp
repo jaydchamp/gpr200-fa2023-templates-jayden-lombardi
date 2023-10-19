@@ -211,7 +211,7 @@ void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls
 	ew::Vec3 up = ew::Normalize(ew::Cross(right, forward));
 
 	//keyboard controls for cam movement
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)//forward
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)//forwar
 	{
 		camera->position += forward * controls->moveSpeed * deltaTime;
 	}
