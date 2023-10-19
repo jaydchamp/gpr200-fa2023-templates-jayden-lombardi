@@ -43,7 +43,7 @@ namespace myLib
 		
 		float yaw = 0, pitch = 0; //degrees
 		float mousesSens = 0.1f; //how fast to turn with mouse
-		float moveSpeed = 5.0f; //how fast to move with arrow keys
+		float moveSpeed = 0.001f; //how fast to move with arrow keys
 		bool firstMouse = true; //flag to score intitial mouse position
 
 	};

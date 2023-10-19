@@ -14,7 +14,8 @@
 #include <jlLib/camera.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
-void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls* controls);
+void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls* controls, float deltaTime);
+void resetCameraAndControls(myLib::Camera* camera, myLib::CameraControls* controls);
 
 //Projection will account for aspect ratio!
 const int SCREEN_WIDTH = 1080;
@@ -76,10 +77,16 @@ int main() {
 	camera.orthographic = false;
 	camera.orthoSize = 6.0f; 
 
+	float prevTime = (float)glfwGetTime();
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+		
+		//Calculate deltaTime
+		float time = (float)glfwGetTime(); //current timestamp
+		float deltaTime = time - prevTime;
 
-		moveCamera(window, &camera, &cameraControls);
+		moveCamera(window, &camera, &cameraControls, deltaTime);
 
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
@@ -98,13 +105,6 @@ int main() {
 			cubeMesh.draw(); 
 		}
 
-		//printf("Camera Position: %.2f, %.2f, %.2f\n", camera.position.x, camera.position.y, camera.position.z);
-		//printf("Camera Target: %.2f, %.2f, %.2f\n", camera.target.x, camera.target.y, camera.target.z);
-		//printf("CUBE1 Position: %.2f, %.2f, %.2f\n", cubeTransforms[0].position.x, cubeTransforms[0].position.y, cubeTransforms[0].position.z);
-		//printf("CUBE2 Position: %.2f, %.2f, %.2f\n", cubeTransforms[1].position.x, cubeTransforms[1].position.y, cubeTransforms[1].position.z);
-		//printf("CUBE3 Position: %.2f, %.2f, %.2f\n", cubeTransforms[2].position.x, cubeTransforms[2].position.y, cubeTransforms[2].position.z);
-		//printf("CUBE4 Position: %.2f, %.2f, %.2f\n", cubeTransforms[3].position.x, cubeTransforms[3].position.y, cubeTransforms[3].position.z);
-
 		//Render UI
 		{
 			ImGui_ImplGlfw_NewFrame();
@@ -122,6 +122,9 @@ int main() {
 				ImGui::Checkbox("Orthographic", &camera.orthographic);
 				if (camera.orthographic) {
 					ImGui::DragFloat("Ortho Size", &camera.orthoSize, 0.1f);
+				}
+				if (ImGui::Button("Reset Camera")) { 
+					resetCameraAndControls(&camera, &cameraControls); 
 				}
 			}
 
@@ -152,7 +155,7 @@ void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 	glViewport(0, 0, width, height);
 }
 
-void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls* controls)
+void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls* controls, float deltaTime)
 {
 	//If right mouse is not held, release cursor and return early.
 	if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)) { 
@@ -204,6 +207,35 @@ void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls
 	forward.z = sin(ew::Radians(controls->yaw)) * cos(ew::Radians(controls->pitch));
 	forward = ew::Normalize(forward);
 
+	ew::Vec3 right = ew::Normalize(ew::Cross(forward, ew::Vec3(0, 1, 0)));
+	ew::Vec3 up = ew::Normalize(ew::Cross(right, forward));
+
+	//keyboard controls for cam movement
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)//forward
+	{
+		camera->position += forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) //back
+	{
+		camera->position -= forward * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) //left
+	{
+		camera->position -= right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) //right
+	{
+		camera->position += right * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) //down
+	{
+		camera->position += up * controls->moveSpeed * deltaTime;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) //up
+	{
+		camera->position -= up * controls->moveSpeed * deltaTime;
+	}
+
 	//setting target to a point in front of the camera along its forward direction, our LookAt will be updated accordingly when rendering.
 	camera->target = camera->position + forward;
 
@@ -211,4 +243,21 @@ void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls
 	controls->prevMouseX = mouseX; 
 	controls->prevMouseY = mouseY;
 
+}
+
+void resetCameraAndControls(myLib::Camera* camera, myLib::CameraControls* controls) 
+{
+	// Set camera and controls back to their default values
+	camera->position = ew::Vec3(0.0f, 0.0f, 5.0f);
+	camera->target = ew::Vec3(0.0f, 0.0f, 0.0f);
+	camera->fov = 60.0f;
+	camera->aspectRatio = static_cast<float>(SCREEN_WIDTH) / static_cast<float>(SCREEN_HEIGHT); 
+	camera->nearPlane = 0.1f; 
+	camera->farPlane = 100.0f; 
+	camera->orthographic = false; 
+	camera->orthoSize = 6.0f; 
+	controls->yaw = 0.0f;
+	controls->pitch = 0.0f;
+	controls->mousesSens = 0.1f;
+	controls->moveSpeed = 0.001f;
 }
