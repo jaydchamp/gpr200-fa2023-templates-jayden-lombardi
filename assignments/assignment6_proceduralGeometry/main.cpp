@@ -14,6 +14,7 @@
 #include <ew/transform.h>
 #include <ew/camera.h>
 #include <ew/cameraController.h>
+#include <jlLib/procGen.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
@@ -59,6 +60,22 @@ int main() {
 		printf("GLAD Failed to load GL headers");
 		return 1;
 	}
+
+	//create mesh data
+	ew::MeshData sphereMeshData = myLib::createSphere(0.5f, 64); 
+	ew::MeshData cylinderMeshData = myLib::createSphere(0.5f, 64); 
+	ew::MeshData planeMeshData = myLib::createSphere(0.5f, 64); 
+	//create mesh render
+	ew::Mesh sphereMesh(sphereMeshData); 
+	ew::Mesh cylinderMesh(cylinderMeshData); 
+	ew::Mesh planeMesh(planeMeshData); 
+	//initialize transform
+	ew::Transform sphereTransform; 
+	ew::Transform cylinderTransform; 
+	ew::Transform planeTransform; 
+	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
+	cylinderTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
+	planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
 	//Initialize ImGUI
 	IMGUI_CHECKVERSION();
@@ -118,8 +135,12 @@ int main() {
 		shader.setVec3("_LightDir", lightF);
 
 		//Draw cube
-		shader.setMat4("_Model", cubeTransform.getModelMatrix());
-		cubeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix()); 
+		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
+		shader.setMat4("_Model", planeTransform.getModelMatrix()); 
+		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
 
 		//Render UI
 		{
