@@ -19,11 +19,11 @@ namespace myLib
 		float orthoSize; //height of orthographic frustum
 		bool orthographic; //perspective or orthographic?
 
-		ew::Mat4 ViewMatrix()//go from World->View space
+		ew::Mat4 ViewMatrix() const//go from World->View space
 		{
 			return ew::LookAt(position, target, ew::Vec3(0.0f, 1.0f, 0.0f)); 
 		}
-		ew::Mat4 ProjectionMatrix() // go from View->Clip space
+		ew::Mat4 ProjectionMatrix() const // go from View->Clip space
 		{
 			if (orthographic) {
 				//Orthographic projection

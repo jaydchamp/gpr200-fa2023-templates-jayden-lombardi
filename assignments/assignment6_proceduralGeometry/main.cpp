@@ -63,19 +63,19 @@ int main() {
 
 	//create mesh data
 	ew::MeshData sphereMeshData = myLib::createSphere(0.5f, 64); 
-	ew::MeshData cylinderMeshData = myLib::createSphere(0.5f, 64); 
-	ew::MeshData planeMeshData = myLib::createSphere(0.5f, 64); 
+	//ew::MeshData cylinderMeshData = myLib::createSphere(0.5f, 64); 
+	//ew::MeshData planeMeshData = myLib::createSphere(0.5f, 64); 
 	//create mesh render
 	ew::Mesh sphereMesh(sphereMeshData); 
-	ew::Mesh cylinderMesh(cylinderMeshData); 
-	ew::Mesh planeMesh(planeMeshData); 
+	//ew::Mesh cylinderMesh(cylinderMeshData); 
+	//ew::Mesh planeMesh(planeMeshData); 
 	//initialize transform
 	ew::Transform sphereTransform; 
-	ew::Transform cylinderTransform; 
-	ew::Transform planeTransform; 
+	//ew::Transform cylinderTransform; 
+	//ew::Transform planeTransform; 
 	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
-	cylinderTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
-	planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
+	//cylinderTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
+	//planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
 	//Initialize ImGUI
 	IMGUI_CHECKVERSION();
@@ -116,11 +116,7 @@ int main() {
 
 		//Render
 		glClearColor(appSettings.bgColor.x, appSettings.bgColor.y, appSettings.bgColor.z,1.0f);
-
-		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		
 
 		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
@@ -137,10 +133,10 @@ int main() {
 		//Draw cube
 		shader.setMat4("_Model", sphereTransform.getModelMatrix());
 		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
-		shader.setMat4("_Model", cylinderTransform.getModelMatrix()); 
-		cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
-		shader.setMat4("_Model", planeTransform.getModelMatrix()); 
-		planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
+		//shader.setMat4("_Model", cylinderTransform.getModelMatrix()); 
+		//cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
+		//shader.setMat4("_Model", planeTransform.getModelMatrix()); 
+		//planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
 
 		//Render UI
 		{

@@ -10,8 +10,9 @@
 
 #include <ew/shader.h>
 #include <ew/procGen.h>
-#include <ew/transform.h>
+#include <ew/transform.h>	
 #include <jlLib/camera.h>
+#include <jlLib/procGen.h>
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void moveCamera(GLFWwindow* window, myLib::Camera* camera, myLib::CameraControls* controls, float deltaTime);
@@ -67,6 +68,21 @@ int main() {
 
 	myLib::Camera camera;
 	myLib::CameraControls cameraControls;
+	//create mesh data
+	ew::MeshData sphereMeshData = myLib::createSphere(0.5f, 64);
+	ew::MeshData cylinderMeshData = myLib::createSphere(0.5f, 64);
+	ew::MeshData planeMeshData = myLib::createSphere(0.5f, 64);
+	//create mesh render
+	ew::Mesh sphereMesh(sphereMeshData);
+	ew::Mesh cylinderMesh(cylinderMeshData);
+	ew::Mesh planeMesh(planeMeshData);
+	//initialize transform
+	ew::Transform sphereTransform;
+	ew::Transform cylinderTransform;
+	ew::Transform planeTransform;
+	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
+	cylinderTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
+	planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
 	camera.position = ew::Vec3(0.0f, 0.0f, 5.0f);
 	camera.target = ew::Vec3(0.0f, 0.0f, 0.0f);
@@ -95,15 +111,21 @@ int main() {
 		//Set uniforms
 		shader.use();
 
-		//TODO: Set model matrix uniform
-		for (size_t i = 0; i < NUM_CUBES; i++)
-		{
-			//Construct model matrix
-			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix()); 
-			shader.setMat4("_View", camera.ViewMatrix());
-			shader.setMat4("_Projection", camera.ProjectionMatrix());
-			cubeMesh.draw(); 
-		}
+		shader.setMat4("_Model", cubeTransforms[0].getModelMatrix());  
+		shader.setMat4("_View", camera.ViewMatrix());
+		shader.setMat4("_Projection", camera.ProjectionMatrix());
+		cubeMesh.draw(); 
+
+		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+		sphereMesh.draw();
+
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw();
+
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw();
+
+		//set the MODEL VIEW AND PROJECTION matrices for the sphere, cuylinder and plane
 
 		//Render UI
 		{
