@@ -3,7 +3,7 @@
 
 ew::MeshData myLib::createSphere(float radius, int numSegments)
 {
-	ew::MeshData meshData;
+	ew::MeshData sphereMeshData;
 
 	for (int i = 0; i <= numSegments; i++)
 	{
@@ -38,7 +38,7 @@ ew::MeshData myLib::createSphere(float radius, int numSegments)
 			{
 				vertex.normal = ew::Vec3(0, 1, 0); // setting default normal if length is 0
 			}
-			meshData.vertices.push_back(vertex); 
+			sphereMeshData.vertices.push_back(vertex);
 		}
 	}
 
@@ -51,27 +51,106 @@ ew::MeshData myLib::createSphere(float radius, int numSegments)
 			int bottomLeft = topLeft + numSegments + 1;
 			int bottomRight = bottomLeft + 1;
 
-			meshData.indices.push_back(topLeft);
-			meshData.indices.push_back(bottomLeft); 
-			meshData.indices.push_back(topRight); 
+			sphereMeshData.indices.push_back(topLeft);
+			sphereMeshData.indices.push_back(bottomLeft);
+			sphereMeshData.indices.push_back(topRight);
 
-			meshData.indices.push_back(topRight); 
-			meshData.indices.push_back(bottomLeft); 
-			meshData.indices.push_back(bottomRight); 
+			sphereMeshData.indices.push_back(topRight);
+			sphereMeshData.indices.push_back(bottomLeft);
+			sphereMeshData.indices.push_back(bottomRight);
 		}
 	}
 
-	return meshData;
+	return sphereMeshData;
 }
 
 ew::MeshData myLib::createCylinder(float height, float radius, int numSegments)
 {
-	//Jayden Code
-	return ew::MeshData();
+	ew::MeshData cylinderMeshData;
+
+	float segmentHeight = height / static_cast<float>(numSegments);
+	float segmentAngle = (2 * PI) / static_cast<float>(numSegments);
+
+	for (int i = 0; i < numSegments; ++i) 
+	{
+		float polarAngle = segmentAngle * i;
+		float x = radius * cos(polarAngle);
+		float z = radius * sin(polarAngle);
+
+		for (int j = 0; j < 2; ++j) //twice for top and bottom circles
+		{
+			float y; 
+			if (j == 0) 
+			{
+				y = -height / 2.0f;
+			}
+			else 
+			{
+				y = height / 2.0f;
+			}
+
+			ew::Vertex vertex;
+			vertex.pos = { x, y, z };
+			vertex.normal = { x, 0.0f, z }; // Normal is same as position for a simple example
+			vertex.uv = { static_cast<float>(i) / numSegments, static_cast<float>(j) }; // Adjust UVs as needed
+
+			cylinderMeshData.vertices.push_back(vertex);
+		}
+	}
+
+	for (int i = 0; i < numSegments; ++i) 
+	{
+		int next = (i + 1) % numSegments;
+		cylinderMeshData.indices.push_back(i * 2);
+		cylinderMeshData.indices.push_back(next * 2);
+		cylinderMeshData.indices.push_back(next * 2 + 1);
+
+		cylinderMeshData.indices.push_back(i * 2);
+		cylinderMeshData.indices.push_back(next * 2 + 1);
+		cylinderMeshData.indices.push_back(i * 2 + 1);
+	}
+
+	return cylinderMeshData;
 }
 
 ew::MeshData myLib::createPlane(float width, float height, int subDivisions)
 {
-	//Jayden Code
-	return ew::MeshData();
+	ew::MeshData planeMeshData;
+
+	float stepX = width / subDivisions;
+	float stepY = height / subDivisions;
+
+	for (int i = 0; i <= subDivisions; ++i) 
+	{
+		for (int j = 0; j <= subDivisions; ++j) 
+		{
+			ew::Vertex vertex;
+			vertex.pos = { j * stepX - (width / 2.0f), 0.0f, i * stepY - (height / 2.0f) }; 
+			vertex.normal = { 0.0f, 1.0f, 0.0f };
+			vertex.uv = { static_cast<float>(j) / subDivisions, static_cast<float>(i) / subDivisions }; 
+
+			planeMeshData.vertices.push_back(vertex);
+		}
+	}
+
+	for (int i = 0; i < subDivisions; ++i) 
+	{
+		for (int j = 0; j < subDivisions; ++j) 
+		{
+			int topLeft = i * (subDivisions + 1) + j; 
+			int topRight = topLeft + 1;  
+			int bottomLeft = (i + 1) * (subDivisions + 1) + j; 
+			int bottomRight = bottomLeft + 1; 
+
+			planeMeshData.indices.push_back(topLeft); 
+			planeMeshData.indices.push_back(bottomLeft); 
+			planeMeshData.indices.push_back(topRight); 
+
+			planeMeshData.indices.push_back(topRight); 
+			planeMeshData.indices.push_back(bottomLeft); 
+			planeMeshData.indices.push_back(bottomRight); 
+		}
+	}
+
+	return planeMeshData;
 }
