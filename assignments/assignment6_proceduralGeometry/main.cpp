@@ -61,19 +61,18 @@ int main() {
 		return 1;
 	}
 
-	//create mesh data
-	ew::MeshData sphereMeshData = myLib::createSphere(0.5f, 64); 
+	//ew::MeshData sphereMeshData = myLib::createSphere(0.5f, 64); 
 	//ew::MeshData cylinderMeshData = myLib::createSphere(0.5f, 64); 
 	//ew::MeshData planeMeshData = myLib::createSphere(0.5f, 64); 
 	//create mesh render
-	ew::Mesh sphereMesh(sphereMeshData); 
+	//ew::Mesh sphereMesh(sphereMeshData); 
 	//ew::Mesh cylinderMesh(cylinderMeshData); 
 	//ew::Mesh planeMesh(planeMeshData); 
 	//initialize transform
-	ew::Transform sphereTransform; 
+	//ew::Transform sphereTransform; 
 	//ew::Transform cylinderTransform; 
 	//ew::Transform planeTransform; 
-	sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
+	//sphereTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
 	//cylinderTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f); 
 	//planeTransform.position = ew::Vec3(1.0f, 0.0f, 0.0f);
 
@@ -95,12 +94,19 @@ int main() {
 	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
-	//Create cube
-	ew::MeshData cubeMeshData = ew::createCube(0.5f);
-	ew::Mesh cubeMesh(cubeMeshData);
+	ew::Mesh cubeMesh(ew::createCube(1.0f));
+	ew::Mesh planeMesh(myLib::createPlane(5.0f, 5.0f, 10));
+	ew::Mesh sphereMesh(myLib::createSphere(0.5f, 64));
+	ew::Mesh cylinderMesh(myLib::createCylinder(0.5f, 1.0f, 32));
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
+	ew::Transform planeTransform;
+	ew::Transform sphereTransform;
+	ew::Transform cylinderTransform;
+	planeTransform.position = ew::Vec3(0, -1.0, 0);
+	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
+	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
 	resetCamera(camera,cameraController);
 
@@ -130,13 +136,17 @@ int main() {
 		ew::Vec3 lightF = ew::Vec3(sinf(lightRot.y) * cosf(lightRot.x), sinf(lightRot.x), -cosf(lightRot.y) * cosf(lightRot.x));
 		shader.setVec3("_LightDir", lightF);
 
-		//Draw cube
+		//draw shapes
+		shader.setMat4("_Model", cubeTransform.getModelMatrix());
+		cubeMesh.draw();
+		shader.setMat4("_Model", planeTransform.getModelMatrix());
+		planeMesh.draw();
 		shader.setMat4("_Model", sphereTransform.getModelMatrix());
-		sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
-		//shader.setMat4("_Model", cylinderTransform.getModelMatrix()); 
-		//cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
-		//shader.setMat4("_Model", planeTransform.getModelMatrix()); 
-		//planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
+		sphereMesh.draw();
+		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+		cylinderMesh.draw();
+
+		//sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints); 
 
 		//Render UI
 		{
