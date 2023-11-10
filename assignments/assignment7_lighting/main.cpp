@@ -27,6 +27,18 @@ ew::Vec3 bgColor = ew::Vec3(0.1f);
 ew::Camera camera;
 ew::CameraController cameraController;
 
+struct Light {
+	ew::Vec3 position; // world space
+	ew::Vec3 color; //rgb value
+};
+
+struct Material {
+	float ambientK; //Ambient (0-1)
+	float diffuseK; //Diffuse (0-1)
+	float specular; //Specular (0-1)
+	float shininess; //Shininess
+};
+
 int main() {
 	printf("Initializing...");
 	if (!glfwInit()) {
@@ -97,6 +109,8 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+		//shader.setVec3("_Light.position", light[0].position);
+		//shader.setVec3("_Light.color", light[0].color);
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
