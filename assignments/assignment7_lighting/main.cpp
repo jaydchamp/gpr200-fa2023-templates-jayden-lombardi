@@ -20,6 +20,7 @@ void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 
 int SCREEN_WIDTH = 1080;
 int SCREEN_HEIGHT = 720;
+const int MAX_LIGHTS = 4;
 
 float prevTime;
 ew::Vec3 bgColor = ew::Vec3(0.1f);
@@ -88,6 +89,16 @@ int main() {
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
+	Light light[MAX_LIGHTS];
+	light[0].position = ew::Vec3(-1.0f, -1.0f, 0.0f);
+	light[0].color = ew::Vec3(1.0f, 1.0f, 1.0f);
+	light[1].position = ew::Vec3(1.0f, 1.0f, 0.0f);
+	light[1].color = ew::Vec3(1.0f, 1.0f, 1.0f);
+	light[2].position = ew::Vec3(1.0f, 0.0f, 0.0f); 
+	light[2].color = ew::Vec3(1.0f, 1.0f, 1.0f);
+	light[3].position = ew::Vec3(-1.0f, 5.0f, 0.0f);
+	light[3].color = ew::Vec3(1.0f, 1.0f, 1.0f);
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -109,8 +120,14 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
-		//shader.setVec3("_Light.position", light[0].position);
-		//shader.setVec3("_Light.color", light[0].color);
+		shader.setVec3("_Light.position", light[0].position);
+		shader.setVec3("_Light.color", light[0].color);
+		shader.setVec3("_Light.position", light[1].position);
+		shader.setVec3("_Light.color", light[1].color);
+		shader.setVec3("_Light.position", light[2].position);
+		shader.setVec3("_Light.color", light[2].color);
+		shader.setVec3("_Light.position", light[3].position);
+		shader.setVec3("_Light.color", light[3].color);
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());

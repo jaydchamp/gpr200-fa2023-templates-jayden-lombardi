@@ -15,12 +15,13 @@ uniform mat4 _ViewProjection;
 
 void main(){
 	vs_out.UV = vUV;
-	//TODO: Calculate vs_out.WorldPosition
-	//TODO: Calculate vs_out.WorldNormal (see Normal Matrix in slides)
-	/*[ 1 0 0 tx     [ nx
-		0 1 0 ty       ny
-		0 0 1 tz       nz
-		0 0 0 1  ]     0  ]*/
+
+	//vs_out.WorldPosition
+	vs_out.WorldPosition = (vec4(vPos, 1.0) * _Model).xyz;
+
+	//vs_out.WorldNormal (see Normal Matrix in slides)
+	mat3 normalMatrix = transpose(inverse(mat3(_Model)));
+    vs_out.WorldNormal = normalize(normalMatrix * vNormal);
 
 	gl_Position = _ViewProjection * _Model * vec4(vPos,1.0);
 }
