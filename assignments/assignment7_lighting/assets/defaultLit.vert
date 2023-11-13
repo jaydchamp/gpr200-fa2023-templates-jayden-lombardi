@@ -5,7 +5,6 @@ layout(location = 2) in vec2 vUV;
 
 out Surface{
 	vec2 UV;
-	//added:
 	vec3 WorldPosition;
 	vec3 WorldNormal;
 }vs_out;

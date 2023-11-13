@@ -72,6 +72,7 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
+	ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
 	//Create cube
@@ -90,14 +91,22 @@ int main() {
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
 	Light light[MAX_LIGHTS];
-	light[0].position = ew::Vec3(-1.0f, -1.0f, 0.0f);
-	light[0].color = ew::Vec3(1.0f, 1.0f, 1.0f);
-	light[1].position = ew::Vec3(1.0f, 1.0f, 0.0f);
-	light[1].color = ew::Vec3(1.0f, 1.0f, 1.0f);
-	light[2].position = ew::Vec3(1.0f, 0.0f, 0.0f); 
-	light[2].color = ew::Vec3(1.0f, 1.0f, 1.0f);
-	light[3].position = ew::Vec3(-1.0f, 5.0f, 0.0f);
-	light[3].color = ew::Vec3(1.0f, 1.0f, 1.0f);
+	light[0].position = ew::Vec3(-3.0f, 1.0f, 0.0f);
+	light[0].color = ew::Vec3(0.0f, 1.0f, 0.0f);
+	light[1].position = ew::Vec3(3.0f, 1.0f, 0.0f);
+	light[1].color = ew::Vec3(0.0f, 0.0f, 1.0f);
+	light[2].position = ew::Vec3(-1.5f, 1.0f, -3.0f);
+	light[2].color = ew::Vec3(1.0f, 0.0f, 0.0f);
+	light[3].position = ew::Vec3(1.5f, 1.0f, -3.0f);
+	light[3].color = ew::Vec3(1.0f, 1.0f, 0.0f);
+	int numLights = 1; 
+	bool orbitSpheres = false;
+
+	Material material;
+	material.ambientK = 0.5;
+	material.diffuseK = 0.5;
+	material.specular = 0.5;
+	material.shininess = 0;
 
 	resetCamera(camera,cameraController);
 
@@ -115,21 +124,25 @@ int main() {
 		//RENDER
 		glClearColor(bgColor.x, bgColor.y,bgColor.z,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
-		shader.setInt("_Texture", 0);
-		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
-		shader.setVec3("_Light.position", light[0].position);
-		shader.setVec3("_Light.color", light[0].color);
-		shader.setVec3("_Light.position", light[1].position);
-		shader.setVec3("_Light.color", light[1].color);
-		shader.setVec3("_Light.position", light[2].position);
-		shader.setVec3("_Light.color", light[2].color);
-		shader.setVec3("_Light.position", light[3].position);
-		shader.setVec3("_Light.color", light[3].color);
+
+		//spheres orbitting or not?
+		if (orbitSpheres) 
+		{
+			for (int i = 0; i < numLights; i++) 
+			{
+				light[i].position.x = 3.0f * cos(0.5f * time + i * 1.57f); 
+				light[i].position.z = 3.0f * sin(0.5f * time + i * 1.57f); 
+			}
+		}
 
 		//Draw shapes
+		shader.use();
+		shader.setInt("_Texture", 0);
+		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+		shader.setVec3("_Color", material.ambientK);
+
+
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw();
 
@@ -142,7 +155,36 @@ int main() {
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw();
 
-		//TODO: Render point lights
+		//render spheres:
+		lightShader.use();
+		lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+
+		ew::Transform lightTransform;
+		lightTransform.position = light[0].position;
+		lightTransform.scale = ew::Vec3(0.1f); //scale down
+		lightShader.setMat4("_Model", lightTransform.getModelMatrix());
+
+		lightShader.setVec3("_Color", light[0].color);
+		sphereMesh.draw();
+
+		//rendering is only done if there is more than 1 lights requested from the user
+		//using "i < numLights" instead of "i < MAX_LIGHTS"
+		if (numLights > 1) 
+		{
+			for (int i = 1; i < numLights; i++) 
+			{
+				ew::Transform additionalLightTransform; 
+				additionalLightTransform.position = light[i].position; 
+				additionalLightTransform.scale = ew::Vec3(0.1f); // Scale down 
+				lightShader.setMat4("_Model", additionalLightTransform.getModelMatrix()); 
+
+				// Set the color of the additional light source
+				lightShader.setVec3("_Color", light[i].color);
+
+				// Draw the additional light source sphere
+				sphereMesh.draw();
+			}
+		}
 
 		//Render UI
 		{
@@ -152,25 +194,39 @@ int main() {
 
 			ImGui::Begin("Settings");
 			if (ImGui::CollapsingHeader("Camera")) {
-				ImGui::DragFloat3("Position", &camera.position.x, 0.1f);
-				ImGui::DragFloat3("Target", &camera.target.x, 0.1f);
-				ImGui::Checkbox("Orthographic", &camera.orthographic);
-				if (camera.orthographic) {
-					ImGui::DragFloat("Ortho Height", &camera.orthoHeight, 0.1f);
-				}
-				else {
-					ImGui::SliderFloat("FOV", &camera.fov, 0.0f, 180.0f);
-				}
-				ImGui::DragFloat("Near Plane", &camera.nearPlane, 0.1f, 0.0f);
-				ImGui::DragFloat("Far Plane", &camera.farPlane, 0.1f, 0.0f);
 				ImGui::DragFloat("Move Speed", &cameraController.moveSpeed, 0.1f);
 				ImGui::DragFloat("Sprint Speed", &cameraController.sprintMoveSpeed, 0.1f);
+				ImGui::ColorEdit3("BG color", &bgColor.x); 
+				ImGui::SliderInt("Number of Lights", &numLights, 1, MAX_LIGHTS);
+				ImGui::Checkbox("Orbit Spheres", &orbitSpheres);
 				if (ImGui::Button("Reset")) {
 					resetCamera(camera, cameraController);
 				}
 			}
+			//Begin with 1 light and allow more upon request
+			//for every unqiue light add a new collapsing header
+			for (int i = 0; i < numLights; ++i) {
+				ImGui::PushID(i); //unique lights
+				if (ImGui::CollapsingHeader(("Light " + std::to_string(i + 1)).c_str())) {
+					// Show constantly changing light position
+					ImGui::Text("Light Position:", light[i].position.x, light[i].position.y, light[i].position.z);
+					// Allow for RGB color changing
+					ImGui::ColorEdit3(("Color##" + std::to_string(i)).c_str(), &light[i].color.x);
+				}
+				ImGui::PopID();
+			}
 
-			ImGui::ColorEdit3("BG color", &bgColor.x);
+			if (ImGui::CollapsingHeader("Material")) {
+				//AmbientK Slider 0-1
+				ImGui::SliderFloat("Ambient", &material.ambientK, 0, 1);
+				//DiffuseK Slider 0-1
+				ImGui::SliderFloat("Diffuse", &material.diffuseK, 0, 1);
+				//SpecularK Slider 0-1
+				ImGui::SliderFloat("Specular", &material.specular, 0, 1);
+				//Shinniniess slider 0-1024
+				ImGui::SliderFloat("Shiny", &material.shininess, 0, 1024);
+			}
+
 			ImGui::End();
 			
 			ImGui::Render();

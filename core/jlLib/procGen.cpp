@@ -124,7 +124,7 @@ ew::MeshData myLib::createSphere(float radius, int numSegments)
 	//return sphereMeshData;
 }
 
-ew::MeshData createCylinderRing(ew::MeshData* meshData, float radius, int subdivisions, float y, bool sideFacing)
+void myLib::createCylinderRing(ew::MeshData* meshData, float radius, int subdivisions, float y, bool sideFacing)
 {
 	//Assignment 7 / Proffesor Code:
 	float thetaStep = ew::TAU / subdivisions; 
