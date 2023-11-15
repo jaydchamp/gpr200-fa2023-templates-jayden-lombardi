@@ -90,6 +90,12 @@ int main() {
 	sphereTransform.position = ew::Vec3(-1.5f, 0.0f, 0.0f);
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
+	Material material;
+	material.ambientK = 0.5;
+	material.diffuseK = 0.5;
+	material.specular = 0.5;
+	material.shininess = 20;
+
 	Light light[MAX_LIGHTS];
 	light[0].position = ew::Vec3(-3.0f, 1.0f, 0.0f);
 	light[0].color = ew::Vec3(0.0f, 1.0f, 0.0f);
@@ -101,12 +107,6 @@ int main() {
 	light[3].color = ew::Vec3(1.0f, 1.0f, 0.0f);
 	int numLights = 1; 
 	bool orbitSpheres = false;
-
-	Material material;
-	material.ambientK = 0.5;
-	material.diffuseK = 0.5;
-	material.specular = 0.5;
-	material.shininess = 0;
 
 	resetCamera(camera,cameraController);
 
@@ -140,8 +140,20 @@ int main() {
 		shader.use();
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
-		shader.setVec3("_Color", material.ambientK);
+		shader.setVec3("_Color", ew::Vec3(material.ambientK));
+		shader.setVec3("_CameraPosition", camera.position);
 
+		shader.setFloat("_Material.ambientK", material.ambientK);
+		shader.setFloat("_Material.diffuseK", material.diffuseK);
+		shader.setFloat("_Material.specular", material.specular);
+		shader.setFloat("_Material.shininess", material.shininess);
+
+		//
+		for (int i = 0; i < numLights; i++) 
+		{
+			shader.setVec3("_Lights[" + std::to_string(i) + "].position", light[i].position);
+			shader.setVec3("_Lights[" + std::to_string(i) + "].color", light[i].color);
+		}
 
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw();
@@ -163,8 +175,8 @@ int main() {
 		lightTransform.position = light[0].position;
 		lightTransform.scale = ew::Vec3(0.1f); //scale down
 		lightShader.setMat4("_Model", lightTransform.getModelMatrix());
-
 		lightShader.setVec3("_Color", light[0].color);
+		lightShader.setVec3("_CameraPosition", camera.position);
 		sphereMesh.draw();
 
 		//rendering is only done if there is more than 1 lights requested from the user
@@ -177,11 +189,8 @@ int main() {
 				additionalLightTransform.position = light[i].position; 
 				additionalLightTransform.scale = ew::Vec3(0.1f); // Scale down 
 				lightShader.setMat4("_Model", additionalLightTransform.getModelMatrix()); 
-
-				// Set the color of the additional light source
 				lightShader.setVec3("_Color", light[i].color);
-
-				// Draw the additional light source sphere
+				lightShader.setVec3("_CameraPosition", camera.position);
 				sphereMesh.draw();
 			}
 		}

@@ -7,6 +7,7 @@ out Surface{
 	vec2 UV;
 	vec3 WorldPosition;
 	vec3 WorldNormal;
+	vec3 CameraPosition;
 }vs_out;
 
 uniform mat4 _Model;
@@ -21,6 +22,8 @@ void main(){
 	//vs_out.WorldNormal (see Normal Matrix in slides)
 	mat3 normalMatrix = transpose(inverse(mat3(_Model)));
     vs_out.WorldNormal = normalize(normalMatrix * vNormal);
+
+    vs_out.CameraPosition = (_Model * vec4(0.0, 0.0, 0.0, 1.0)).xyz;
 
 	gl_Position = _ViewProjection * _Model * vec4(vPos,1.0);
 }
