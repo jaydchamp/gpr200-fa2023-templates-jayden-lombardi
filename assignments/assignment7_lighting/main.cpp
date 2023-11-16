@@ -157,13 +157,10 @@ int main() {
 
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		cubeMesh.draw();
-
 		shader.setMat4("_Model", planeTransform.getModelMatrix());
 		planeMesh.draw();
-
 		shader.setMat4("_Model", sphereTransform.getModelMatrix());
 		sphereMesh.draw();
-
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw();
 
